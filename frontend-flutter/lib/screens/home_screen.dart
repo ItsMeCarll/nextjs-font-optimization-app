@@ -96,7 +96,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             pinned: true,
             expandedHeight: 200,
             flexibleSpace: FlexibleSpaceBar(
-              title: const Text('Video Downloader'),
+              title: const Text('Video Downloader Pro'),
               background: Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
