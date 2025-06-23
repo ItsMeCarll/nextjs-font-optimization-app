@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:flutter_acr/flutter_acr.dart';
@@ -16,6 +17,8 @@ import 'download_service.dart';
 import 'features_service.dart';
 import 'storage_service.dart';
 import 'player_service.dart';
+import 'storage_path_service.dart';
+import 'auth_service.dart';
 
 class AppService extends ChangeNotifier {
   // Servicios
@@ -64,7 +67,6 @@ class AppService extends ChangeNotifier {
 
       // Inicializar servicios
       _settings = AppSettings();
-      await _settings.init();
 
       _apiService = ApiService();
       
