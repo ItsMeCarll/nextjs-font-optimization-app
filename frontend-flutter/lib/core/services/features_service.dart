@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:speech_to_text/speech_to_text.dart';
-import 'package:flutter_acr/flutter_acr.dart';
 import 'package:local_auth/local_auth.dart';
 import '../models/app_settings.dart';
 import 'api_service.dart';
@@ -9,20 +8,16 @@ import 'api_service.dart';
 class FeaturesService {
   final FlutterLocalNotificationsPlugin _notifications;
   final SpeechToText _speechToText;
-  final FlutterAcr _musicRecognition;
   final LocalAuthentication _localAuth;
   final ApiService _apiService;
   final AppSettings _settings;
 
   bool _isListening = false;
-  bool _isRecognizingMusic = false;
   StreamController<String>? _voiceCommandController;
-  StreamController<Map<String, dynamic>>? _musicRecognitionController;
 
   FeaturesService(
     this._notifications,
     this._speechToText,
-    this._musicRecognition,
     this._localAuth,
     this._apiService,
     this._settings,
@@ -43,9 +38,6 @@ class FeaturesService {
 
     // Inicializar reconocimiento de voz
     await _speechToText.initialize();
-
-    // Inicializar reconocimiento de música
-    await _musicRecognition.init();
   }
 
   // Notificaciones
@@ -132,50 +124,6 @@ class FeaturesService {
     }
   }
 
-  // Reconocimiento de música
-  Stream<Map<String, dynamic>> get musicRecognitionStream {
-    _musicRecognitionController ??= StreamController<Map<String, dynamic>>.broadcast();
-    return _musicRecognitionController!.stream;
-  }
-
-  Future<void> startMusicRecognition() async {
-    if (!_settings.enableMusicRecognition || _isRecognizingMusic) return;
-
-    _isRecognizingMusic = true;
-    try {
-      await _musicRecognition.start(
-        onResult: (result) {
-          _musicRecognitionController?.add(result);
-          _processMusicRecognition(result);
-        },
-      );
-    } catch (e) {
-      _isRecognizingMusic = false;
-      rethrow;
-    }
-  }
-
-  Future<void> stopMusicRecognition() async {
-    if (!_isRecognizingMusic) return;
-
-    await _musicRecognition.stop();
-    _isRecognizingMusic = false;
-  }
-
-  Future<void> _processMusicRecognition(Map<String, dynamic> result) async {
-    try {
-      showNotification(
-        title: 'Música detectada',
-        body: '${result['title']} - ${result['artist']}',
-      );
-    } catch (e) {
-      showNotification(
-        title: 'Error',
-        body: 'No se pudo identificar la música',
-      );
-    }
-  }
-
   // Autenticación biométrica
   Future<bool> authenticateWithBiometrics() async {
     if (!_settings.useFingerprint) return true;
@@ -202,12 +150,9 @@ class FeaturesService {
   // Limpieza de recursos
   void dispose() {
     _voiceCommandController?.close();
-    _musicRecognitionController?.close();
     stopListening();
-    stopMusicRecognition();
   }
 
   // Estado de los servicios
   bool get isListening => _isListening;
-  bool get isRecognizingMusic => _isRecognizingMusic;
 }
