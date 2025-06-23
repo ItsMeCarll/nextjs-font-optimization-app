@@ -24,6 +24,8 @@ class AppService extends ChangeNotifier {
   late final FeaturesService _featuresService;
   late final StorageService _storageService;
   late final PlayerService _playerService;
+  late final StoragePathService _storagePathService;
+  late final AuthService _authService;
   late final AppSettings _settings;
 
   // Estado
@@ -42,6 +44,9 @@ class AppService extends ChangeNotifier {
   VideoInfo? get currentVideo => _currentVideo;
   bool get isVpnActive => _isVpnActive;
   AppSettings get settings => _settings;
+  StoragePathService get storagePathService => _storagePathService;
+  AuthService get authService => _authService;
+  bool get isAuthenticated => _authService.isAuthenticated;
 
   // Streams
   Stream<DownloadTask> get downloadStream => _downloadService.downloadStream;
@@ -78,15 +83,20 @@ class AppService extends ChangeNotifier {
         _settings,
       );
 
+      _storagePathService = StoragePathService(_settings);
+      
       _storageService = StorageService(
         const FlutterSecureStorage(),
         _settings,
+        _storagePathService,
       );
 
       _playerService = PlayerService(_settings);
+      _authService = AuthService();
 
-      // Inicializar almacenamiento
+      // Inicializar servicios
       await _storageService.initializeStorage();
+      await Firebase.initializeApp();
 
       // Cargar datos iniciales
       await _loadInitialData();
@@ -122,6 +132,19 @@ class AppService extends ChangeNotifier {
       }
       notifyListeners();
     });
+  }
+
+  // Métodos de autenticación
+  Future<bool> requireAuthentication(String platform) async {
+    if (!_authService.hasPlatformAccess(platform)) {
+      // Mostrar pantalla de autenticación si no tiene acceso
+      return false;
+    }
+    return true;
+  }
+
+  Future<String?> getPlatformToken(String platform) async {
+    return _authService.getPlatformToken(platform);
   }
 
   // Métodos para gestionar descargas
