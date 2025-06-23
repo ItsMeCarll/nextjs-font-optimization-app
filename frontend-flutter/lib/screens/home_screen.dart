@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'webview_screen.dart';
+import 'auth_screen.dart';
+import '../core/services/app_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -32,6 +35,39 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     _animationController.dispose();
     _urlController.dispose();
     super.dispose();
+  }
+
+  void _showAuthScreen() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const AuthScreen()),
+    );
+  }
+
+  Future<void> _handlePlatformAccess(String platform) async {
+    final appService = Provider.of<AppService>(context, listen: false);
+    
+    if (!appService.isAuthenticated) {
+      final needsAuth = !await appService.requireAuthentication(platform);
+      if (needsAuth) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Necesitas iniciar sesión para acceder a $platform'),
+              action: SnackBarAction(
+                label: 'Iniciar Sesión',
+                onPressed: _showAuthScreen,
+              ),
+            ),
+          );
+        }
+        return;
+      }
+    }
+
+    // Si está autenticado o no necesita autenticación, continuar
+    _urlController.text = 'https://$platform.com';
+    _openWebView();
   }
 
   void _openWebView() {
@@ -74,6 +110,32 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 ),
               ),
             ),
+            actions: [
+              Consumer<AppService>(
+                builder: (context, appService, child) {
+                  if (appService.isAuthenticated) {
+                    final user = appService.authService.user;
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: CircleAvatar(
+                        backgroundImage: user?.photoURL != null
+                            ? NetworkImage(user!.photoURL!)
+                            : null,
+                        child: user?.photoURL == null
+                            ? Text(user?.displayName?[0].toUpperCase() ?? 'U')
+                            : null,
+                      ),
+                    );
+                  } else {
+                    return IconButton(
+                      icon: const Icon(Icons.login),
+                      onPressed: _showAuthScreen,
+                      tooltip: 'Iniciar Sesión',
+                    );
+                  }
+                },
+              ),
+            ],
           ),
           SliverToBoxAdapter(
             child: FadeTransition(
@@ -155,37 +217,29 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                           icon: Icons.play_circle,
                           title: 'YouTube',
                           color: Colors.red,
-                          onTap: () {
-                            _urlController.text = 'https://youtube.com';
-                            _openWebView();
-                          },
+                          requiresAuth: true,
+                          onTap: () => _handlePlatformAccess('youtube'),
                         ),
                         _PlatformCard(
                           icon: Icons.facebook,
                           title: 'Facebook',
                           color: Colors.blue,
-                          onTap: () {
-                            _urlController.text = 'https://facebook.com';
-                            _openWebView();
-                          },
+                          requiresAuth: true,
+                          onTap: () => _handlePlatformAccess('facebook'),
                         ),
                         _PlatformCard(
                           icon: Icons.camera_alt,
                           title: 'Instagram',
                           color: Colors.purple,
-                          onTap: () {
-                            _urlController.text = 'https://instagram.com';
-                            _openWebView();
-                          },
+                          requiresAuth: false,
+                          onTap: () => _handlePlatformAccess('instagram'),
                         ),
                         _PlatformCard(
                           icon: Icons.music_note,
                           title: 'TikTok',
                           color: Colors.black87,
-                          onTap: () {
-                            _urlController.text = 'https://tiktok.com';
-                            _openWebView();
-                          },
+                          requiresAuth: false,
+                          onTap: () => _handlePlatformAccess('tiktok'),
                         ),
                       ],
                     ),
@@ -234,12 +288,14 @@ class _PlatformCard extends StatelessWidget {
   final String title;
   final Color color;
   final VoidCallback onTap;
+  final bool requiresAuth;
 
   const _PlatformCard({
     required this.icon,
     required this.title,
     required this.color,
     required this.onTap,
+    required this.requiresAuth,
   });
 
   @override
@@ -252,26 +308,40 @@ class _PlatformCard extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                icon,
-                size: 40,
-                color: color,
+        child: Stack(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    icon,
+                    size: 40,
+                    color: color,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 8),
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+            ),
+            if (requiresAuth)
+              Positioned(
+                top: 8,
+                right: 8,
+                child: Icon(
+                  Icons.lock_outline,
+                  size: 16,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               ),
-            ],
-          ),
+          ],
         ),
       ),
     );
