@@ -1,36 +1,142 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Video Downloader Pro
 
-## Getting Started
+Una aplicación moderna y potente para descargar videos de múltiples plataformas como YouTube, Facebook, Instagram, Twitter, y más.
 
-First, run the development server:
+## Características
 
+- 📥 **Descarga de videos**
+  - Soporte para múltiples plataformas
+  - Selección de calidad (hasta 4K)
+  - Extracción de audio (MP3)
+  - Descarga rápida con conexiones paralelas
+
+- 🎵 **Características de Audio**
+  - Conversión a MP3
+  - Reconocimiento de música (estilo Shazam)
+  - Extracción de subtítulos y transcripción
+
+- 🔒 **Privacidad y Seguridad**
+  - Modo VPN integrado
+  - Carpeta privada con protección biométrica
+  - Historial de descargas protegido
+
+- 🎮 **Interfaz Avanzada**
+  - Diseño Material 3
+  - Modo oscuro/claro
+  - Ventana flotante para reproducción
+  - Interfaz intuitiva y moderna
+
+- 🔍 **Búsqueda y Organización**
+  - Motor de búsqueda integrado
+  - Organización automática de archivos
+  - Gestión de listas de reproducción
+  - Detección automática de enlaces
+
+- 🎯 **Características Especiales**
+  - Comandos de voz para descargas
+  - Detección de música en segundo plano
+  - Soporte para múltiples formatos
+  - Notificaciones personalizables
+
+## Tecnologías Utilizadas
+
+### Frontend (Flutter)
+- Material 3 Design
+- Provider para gestión de estado
+- WebView para navegación integrada
+- Reproductor de video/audio personalizado
+- Biometría y almacenamiento seguro
+
+### Backend (FastAPI)
+- API RESTful
+- Procesamiento asíncrono
+- Integración con yt-dlp
+- Transcripción con Whisper
+- Gestión de descargas en segundo plano
+
+### Almacenamiento
+- Firebase Auth
+- Cloud Firestore
+- Cloudinary para medios
+- Almacenamiento local seguro
+
+## Instalación
+
+### Requisitos Previos
+- Flutter SDK
+- Python 3.8+
+- FFmpeg
+- Git
+
+### Frontend (Flutter)
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# Clonar el repositorio
+git clone https://github.com/tuusuario/video-downloader-pro.git
+
+# Navegar al directorio del frontend
+cd video-downloader-pro/frontend-flutter
+
+# Instalar dependencias
+flutter pub get
+
+# Ejecutar la aplicación
+flutter run
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Backend (FastAPI)
+```bash
+# Navegar al directorio del backend
+cd video-downloader-pro/backend-fastapi
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+# Crear entorno virtual
+python -m venv venv
+source venv/bin/activate  # En Windows: venv\Scripts\activate
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Instalar dependencias
+pip install -r requirements.txt
 
-## Learn More
+# Ejecutar el servidor
+uvicorn main:app --reload
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Uso
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. **Descargar Videos**
+   - Pega la URL del video
+   - Selecciona la calidad deseada
+   - Elige el formato (video o audio)
+   - Inicia la descarga
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+2. **Búsqueda de Videos**
+   - Usa el buscador integrado
+   - Filtra por plataforma y categoría
+   - Previsualiza antes de descargar
 
-## Deploy on Vercel
+3. **Gestión de Descargas**
+   - Monitorea el progreso
+   - Pausa/reanuda descargas
+   - Organiza por carpetas
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+4. **Características Avanzadas**
+   - Activa el modo VPN si es necesario
+   - Usa comandos de voz
+   - Configura la carpeta privada
+   - Crea listas de reproducción
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Contribuir
+
+1. Fork el proyecto
+2. Crea una rama para tu función (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
+
+## Licencia
+
+Distribuido bajo la Licencia MIT. Ver `LICENSE` para más información.
+
+## Contacto
+
+Tu Nombre - [@tutwitter](https://twitter.com/tutwitter)
+
+Link del Proyecto: [https://github.com/tuusuario/video-downloader-pro](https://github.com/tuusuario/video-downloader-pro)
