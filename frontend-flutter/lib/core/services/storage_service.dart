@@ -9,30 +9,42 @@ import '../models/app_settings.dart';
 class StorageService {
   final FlutterSecureStorage _secureStorage;
   final AppSettings _settings;
+  final StoragePathService _storagePathService;
   
-  StorageService(this._secureStorage, this._settings);
+  StorageService(this._secureStorage, this._settings, this._storagePathService);
 
   // Directorios principales
-  Future<String> get _baseDir async {
-    if (Platform.isAndroid) {
-      return _settings.downloadLocation;
-    } else {
-      final dir = await getApplicationDocumentsDirectory();
-      return dir.path;
-    }
-  }
-
   Future<Directory> get videosDirectory async =>
-      Directory('${await _baseDir}/videos');
+      Directory(await _storagePathService.getAppVideoPath());
 
   Future<Directory> get audioDirectory async =>
-      Directory('${await _baseDir}/audio');
+      Directory(await _storagePathService.getAppMusicPath());
 
-  Future<Directory> get playlistsDirectory async =>
-      Directory('${await _baseDir}/playlists');
+  Future<Directory> get playlistsDirectory async {
+    final basePath = _settings.downloadLocation;
+    final playlistPath = '$basePath/playlists';
+    final directory = Directory(playlistPath);
+    if (!await directory.exists()) {
+      await directory.create(recursive: true);
+    }
+    return directory;
+  }
 
-  Future<Directory> get privateDirectory async =>
-      Directory('${await _baseDir}/private');
+  Future<Directory> get privateDirectory async {
+    final basePath = _settings.downloadLocation;
+    final privatePath = '$basePath/private';
+    final directory = Directory(privatePath);
+    if (!await directory.exists()) {
+      await directory.create(recursive: true);
+    }
+    if (Platform.isAndroid) {
+      final nomediaFile = File('$privatePath/.nomedia');
+      if (!await nomediaFile.exists()) {
+        await nomediaFile.create();
+      }
+    }
+    return directory;
+  }
 
   // Inicialización y permisos
   Future<void> initializeStorage() async {
